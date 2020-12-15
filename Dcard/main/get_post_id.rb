@@ -38,7 +38,7 @@ def get_post_id(board, sleep_every, sleep_time, prev_day)
       end
     end
     while true
-      break puts "1本版已無符合條件資料" if post_id_created_at == [] || post_id_created_at < search_end_date
+      break puts "本版已無符合條件資料" if post_id_created_at == [] || post_id_created_at < search_end_date
       url = "#{line[2]}&before=#{last_id}"
       uri = URI(url)
       data = Net::HTTP.get(uri)
@@ -47,7 +47,7 @@ def get_post_id(board, sleep_every, sleep_time, prev_day)
       if items.size < 30
         items.each do |item|
           post_id_created_at = item["createdAt"].slice(0, 10)
-          break puts "2本版已無符合條件資料" if post_id_created_at == [] || post_id_created_at < search_end_date
+          break puts "本版已無符合條件資料" if post_id_created_at == [] || post_id_created_at < search_end_date
           begin
             total_cut += 1
             sleep(rand(0.5..1.2))
