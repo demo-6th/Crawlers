@@ -71,7 +71,27 @@ def get_post_id(board, batch_size, sleep_time, prev_day)
     break puts "本版已無符合條件資料" if post_created_at.empty? || post_created_at < ended_at_string || last_id == 0
     items = get_json_from(row[2], "&before=#{last_id}")
 
-    if items.size < 30
+    if items.size > 30
+      count = 0
+      items.each do |item|
+        wait_randomly
+
+        post_created_at = created_at_string(item)
+        break if post_created_at.empty? || post_created_at < ended_at_string
+
+        segmented_post_rows << post_row(item)
+        count += 1
+        total_cut += 1
+
+        puts total_cut, "-----------#{item["title"]}"
+        if count == 30
+          last_id = item["id"]
+          count = 0
+        end
+      rescue => e
+        format_error(e)
+      end
+    else
       items.each do |item|
         post_created_at = created_at_string(item)
         break puts "本版已無符合條件資料" if post_created_at.empty? || post_created_at < ended_at_string
@@ -81,27 +101,6 @@ def get_post_id(board, batch_size, sleep_time, prev_day)
 
         puts total_cut, "-----------#{item["title"]}"
         segmented_post_rows << post_row(item)
-      rescue => e
-        format_error(e)
-      end
-    else
-      count = 0
-      items.each do |item|
-        if total_cut.modulo(batch_size) == 0
-          sleep(sleep_time)
-        else
-          wait_randomly
-        end
-        post_created_at = created_at_string(item)
-        break if post_created_at.empty? || post_created_at < ended_at_string
-        count += 1
-        total_cut += 1
-        segmented_post_rows << post_row(item)
-        puts total_cut, "-----------#{item["title"]}"
-        if count == 30
-          last_id = item["id"]
-          count = 0
-        end
       rescue => e
         format_error(e)
       end

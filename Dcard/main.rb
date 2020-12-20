@@ -3,7 +3,7 @@ require "json"
 require "csv"
 #
 require("./get_forums.rb")
-require("./get_post_id.rb")
+require("./posts_writer.rb")
 require("./get_post_content.rb")
 require("./get_post_comment.rb")
 require("./mv_files.rb")
@@ -26,7 +26,11 @@ def loop_crawler
     # 暫停時休息秒數 / 隨機請參考rand(n..m)
     sleep_time = 3
 
-    get_post_id(board, sleep_every, sleep_time, prev_day)
+    PostsWriter.new(
+      board: board, prev_day: 5,
+      sleep_time: 2, batch_size: sleep_every,
+    ).perform!
+
     get_post_content(sleep_every, sleep_time)
     get_post_comment(sleep_every, sleep_time)
     mv_files(table_title)
